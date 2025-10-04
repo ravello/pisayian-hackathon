@@ -4,6 +4,8 @@
  * -----------------------------------------
  * This route handles:
  *  - Accepting a single CSV file upload via Multer
+ *  - Reading the uploaded file from memory
+ *  - Validating the CSV structure and required fields
  *  - Parsing the CSV contents into JSON rows using PapaParse
  *  - Applying simple transformation logic:
  *      → Rename columns (LastName → last_name, etc.)
@@ -42,8 +44,26 @@ router.post("/", upload.single("file"), (req, res) => {
         const csvString = req.file.buffer.toString("utf8");
         const parsedData = Papa.parse(csvString, { header: true });
 
+        // validate and clean data
+        const currentYear = new Date().getFullYear();
+
+        const validRows = parsedData.data.filter(row => {
+            const hasRequiredFields = row.LastName && row.FirstName && row.Campus && row.Batch;
+            const validBatch = !isNaN(row.Batch) && row.Batch >= 1964 && row.Batch <= currentYear;
+            return hasRequiredFields && validBatch;
+        });
+
+        // normalize campus names
+        const campusMap = {
+            "Pisay Main": "MAIN",
+            "Main Campus": "MAIN",
+            "Diliman": "MAIN",
+            "CVC": "CAGAYAN VALLEY",
+            "WVC": "WESTERN VISAYAS"
+        };
+        
         // sample transformation logic
-        const transformedData = parsedData.data.map(row => ({
+        const transformedData = validRows.map(row => ({
             last_name: row.LastName?.trim(),
             first_name: row.FirstName?.trim(),
             campus: row.Campus?.trim(),
@@ -52,6 +72,7 @@ router.post("/", upload.single("file"), (req, res) => {
 
         // convert back to CSV
         const outputCsv = Papa.unparse(transformedData);
+        // send file response
         res.header("Content-Type", "text/csv");
         res.attachment("pisay_transformed.csv");
         res.send(outputCsv);
