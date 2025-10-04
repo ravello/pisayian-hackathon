@@ -11,6 +11,7 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
 
   // Used for drag and drop csv file section
+  // @ts-expect-error
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: false,
     accept: { "text/csv": [".csv"] },
