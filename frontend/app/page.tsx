@@ -1,47 +1,44 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
-import { useRef, useState } from "react";
+import Image from "next/image";
+import { useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { Upload } from "lucide-react";
 
 export default function Home() {
-  // store the file input DOM element
-  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // create state to store the file after selection
-  const [selectedFile, setSelectedFile] = useState(null);
+  // Used for drag and drop csv file section
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    multiple: false,
+    accept: { "text/csv": [".csv"] },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles && acceptedFiles[0]) {
+        setSelectedFile(acceptedFiles[0]);
+      }
+    },
+  });
 
-  // file selection button
-  const handleClick = () => {
-    // trigger the hidden file input
-    fileInputRef.current.click();
-  };
-
-  // triggered when a file is selected
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      console.log("Selected file:", file.name);
-    }
-  };
-
-  // file upload button
-  // handles upload logic and POST to backend
+  // Checks and sends .csv file to backend
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert('Please select a file first.');
+      alert("Please select a file first.");
       return;
     }
+
+    setIsUploading(true);
 
     // send file to the server to
     // convert the file to Pisayian database format
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append("file", selectedFile);
 
     try {
-      const response = await fetch('http://localhost:5001/api/transform', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5001/api/transform", {
+        method: "POST",
         body: formData,
       });
 
@@ -64,64 +61,85 @@ export default function Home() {
       // cleanup
       window.URL.revokeObjectURL(url);
 
-      alert('File converted successfully! Downloading.');
+      alert("File converted successfully! Downloading.");
     } catch (error) {
-      console.error('Error', error);
-      alert('File upload failed, please try again.');
+      console.error("Error", error);
+      alert("File upload failed, please try again.");
     }
+
+    setIsUploading(false);
   };
 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-gradient-to-b from-yellow-50 to-red-50">
-      <div className="fixed top-0 items-center justify-center">
-       <Link href="https://www.pisayian.org/" target="_blank" rel="noopener noreferrer">
-         <Image
+    <div className="flex flex-col min-h-screen font-sans bg-gradient-to-b from-yellow-50 to-red-50">
+      {/* Header */}
+      <header className="flex justify-center p-4">
+        <Link
+          href="https://www.pisayian.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
             className="dark:invert justify-items-center"
             src="/pisayian_logo.png"
             alt="Pisayian logo"
-            width={200}
-            height={50}
+            width={300}
+            height={300}
             priority
           />
-       </Link>
-      </div>
+        </Link>
+      </header>
 
-      <main className="flex flex-col gap-[32px] row-start-2 text-center items-center sm:items-center">
-          <h1 className="text-3xl font-bold text-center text-blue-600">
+      {/* Main */}
+      <main className="flex-grow flex flex-col items-center mx-20">
+        <div className="flex flex-col items-center gap-4 bg-white border border-neutral-400 rounded-xl py-10 px-10 md-px-10 max-w-150 drop-shadow-xl">
+          <h1 className="text-3xl font-bold text-center">
             Pisayian CSV Converter
           </h1>
-          <h1 className="text-xl text-center">
-            Convert SPECTRA .csv file to Pisayian database .csv file
-          </h1>
-        <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
-        <div className="border border-black/[0.1] dashed rounded-md w-6/4 h-35 items-center justify-center flex">
-        <p className="m-4">
-          Drag and drop your file or  
-        <button className="ml-3 px-4 py-1 transition-colors border border-solid border-black/[0.2]  text-black rounded-full hover:bg-[#f2f2f2] hover:border-black/[0.0]" onClick={handleClick}>
-              Pick a file
-        </button>
-        </p>
-        </div>
-        {selectedFile && (
-            <p>Selected: {selectedFile.name}</p> 
-        )}
-        <button className="flex ml-3 px-4 py-1 transition-colors border border-solid border-black/[0.2]  text-black rounded-full hover:bg-[#f2f2f2] hover:border-black/[0.0]" onClick={handleUpload}> 
-            Upload
-        </button>
-    </main>
+          <p className="text-center text-neutral-500">
+            Convert your SPECTRA .csv file into a Pisayian database .csv file
+          </p>
 
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <p
-          className="flex items-center gap-2 text-sm"
-        >
-          Developed during Kapwa Codefest
+          {/* Dropzone with Icon */}
+          <div
+            {...getRootProps()}
+            className={`border-2 border-dashed rounded-2xl p-10 w-full flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors ${
+              isDragActive
+                ? "border-yellow-500 bg-yellow-50"
+                : "border-neutral-300"
+            }`}
+          >
+            <input {...getInputProps()} />
+            <Upload className="w-12 h-12 text-yellow-500" />
+            <p className="text-center">
+              {selectedFile
+                ? `Uploaded: ${selectedFile.name}`
+                : "Drag and drop your CSV file here, or click to select"}
+            </p>
+          </div>
+
+          <button
+            className={`px-4 py-2 border rounded-full bg-yellow-300 border-yellow-500 hover:bg-yellow-400 transition-colors duration-150 active:bg-yellow-500 font-bold text-yellow-800 shadow-[0_4px_0_0_oklch(79.5%_0.184_86.047)] ${
+              !selectedFile || isUploading
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            disabled={!selectedFile || isUploading}
+            onClick={handleUpload}
+          >
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="flex justify-center items-center p-4 border-t border-neutral-300">
+        <p className="text-sm text-neutral-600">
+          Developed during{" "}
+          <Link href="https://kapwacodefest.com" className="text-yellow-700">
+            Kapwa Codefest
+          </Link>
         </p>
-        
       </footer>
     </div>
   );
