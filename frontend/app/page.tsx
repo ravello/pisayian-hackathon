@@ -28,14 +28,48 @@ export default function Home() {
 
   // file upload button
   // handles upload logic and POST to backend
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
       alert('Please select a file first.');
       return;
     }
 
+    // send file to the server to
     // convert the file to Pisayian database format
-    // TODO
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('http://localhost:5001/api/transform', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error. Status: ${response.status}`);
+      }
+
+      // convert the response to a blob (binary data)
+      const blob = await response.blob();
+
+      // automatically download the converted file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = selectedFile.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // cleanup
+      window.URL.revokeObjectURL(url);
+
+      alert('File converted successfully! Downloading.');
+    } catch (error) {
+      console.error('Error', error);
+      alert('File upload failed, please try again.');
+    }
   };
 
   return (
@@ -73,11 +107,10 @@ export default function Home() {
               Pick a file
         </button>
         </p>
+        </div>
         {selectedFile && (
             <p>Selected: {selectedFile.name}</p> 
         )}
-        </div>
- 
         <button className="flex ml-3 px-4 py-1 transition-colors border border-solid border-black/[0.2]  text-black rounded-full hover:bg-[#f2f2f2] hover:border-black/[0.0]" onClick={handleUpload}> 
             Upload
         </button>
