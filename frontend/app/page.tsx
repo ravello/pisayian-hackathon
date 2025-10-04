@@ -1,102 +1,128 @@
+"use client";
 import Image from "next/image";
+import Link from "next/link";
+import Header from "../components/header.tsx"
+import { useRef, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // store the file input DOM element
+  const fileInputRef = useRef(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // create state to store the file after selection
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  // file selection button
+  const handleClick = () => {
+    // trigger the hidden file input
+    fileInputRef.current.click();
+  };
+
+  // triggered when a file is selected
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      console.log("Selected file:", file.name);
+    }
+  };
+
+  // file upload button
+  // handles upload logic and POST to backend
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
+    // send file to the server to
+    // convert the file to Pisayian database format
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('http://localhost:5001/api/transform', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error. Status: ${response.status}`);
+      }
+
+      // convert the response to a blob (binary data)
+      const blob = await response.blob();
+
+      // automatically download the converted file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = selectedFile.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // cleanup
+      window.URL.revokeObjectURL(url);
+
+      alert('File converted successfully! Downloading.');
+    } catch (error) {
+      console.error('Error', error);
+      alert('File upload failed, please try again.');
+    }
+  };
+
+  return (
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-gradient-to-b from-yellow-50 to-red-50">
+      <div className="fixed top-0 items-center justify-center">
+       <Link href="https://www.pisayian.org/" target="_blank" rel="noopener noreferrer">
+         <Image
+            className="dark:invert justify-items-center"
+            src="/pisayian_logo.png"
+            alt="Pisayian logo"
+            width={200}
+            height={50}
+            priority
+          />
+       </Link>
+      </div>
+
+      <main className="flex flex-col gap-[32px] row-start-2 text-center items-center sm:items-center">
+          <h1 className="text-3xl font-bold text-center text-blue-600">
+            Pisayian CSV Converter
+          </h1>
+          <h1 className="text-xl text-center">
+            Convert SPECTRA .csv file to Pisayian database .csv file
+          </h1>
+        <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+        <div className="border border-black/[0.1] dashed rounded-md w-6/4 h-35 items-center justify-center flex">
+        <p className="m-4">
+          Drag and drop your file or  
+        <button className="ml-3 px-4 py-1 transition-colors border border-solid border-black/[0.2]  text-black rounded-full hover:bg-[#f2f2f2] hover:border-black/[0.0]" onClick={handleClick}>
+              Pick a file
+        </button>
+        </p>
         </div>
-      </main>
+        {selectedFile && (
+            <p>Selected: {selectedFile.name}</p> 
+        )}
+        <button className="flex ml-3 px-4 py-1 transition-colors border border-solid border-black/[0.2]  text-black rounded-full hover:bg-[#f2f2f2] hover:border-black/[0.0]" onClick={handleUpload}> 
+            Upload
+        </button>
+    </main>
+
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <p
+          className="flex items-center gap-2 text-sm"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+          Developed during Kapwa Codefest
+        </p>
+        
       </footer>
     </div>
   );
