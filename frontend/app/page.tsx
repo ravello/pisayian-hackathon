@@ -119,7 +119,7 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <Image
-            className="dark:invert justify-items-center"
+            className="justify-items-center"
             src="/pisayian_logo.png"
             alt="Pisayian logo"
             width={300}
