@@ -71,6 +71,41 @@ export default function Home() {
     setIsUploading(false);
   };
 
+  const handleNormalize = async () => {
+    if(!selectedFile) {
+      alert("Please select a file first.");
+      return;
+    }
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const res = await fetch("http://localhost:5001/api/normalize", {
+      method: "POST",
+      body: formData,
+    });
+
+    if(!res.ok) {
+      alert("Normalization failed");
+      setIsUploading(false);
+      return;
+    }
+
+    // handle ZIP download
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "normalized_output.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setIsUploading(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen font-sans bg-gradient-to-b from-yellow-50 to-red-50">
       {/* Header */}
@@ -130,6 +165,14 @@ export default function Home() {
           >
             {isUploading ? "Uploading..." : "Upload"}
           </button>
+          {/* Normalize Button */}
+          <button
+            className={`px-4 py-2 border rounded-full bg-green-300 border-green-500 hover:bg-green-400 transition-colors duration-150 active:bg-green-500 font-bold text-green-800 shadow-[0_4px_0_0_oklch(79.5%_0.184_86.047)] ${
+              !selectedFile || isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={!selectedFile || isUploading}
+            onClick={handleNormalize}
+            ></button>
         </div>
       </main>
 
