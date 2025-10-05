@@ -92,7 +92,7 @@ The downloaded `.zip` includes:
 
 -**Nolan Dela Rosa**: System architect and backend developer.
 
-Couldn't have asked for a better development team 💙
+**Couldn't have asked for a better development team** 💙
 
 
 
