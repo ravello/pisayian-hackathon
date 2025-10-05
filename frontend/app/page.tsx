@@ -136,7 +136,10 @@ export default function Home() {
             Pisayian CSV Converter
           </h1>
           <p className="text-center text-neutral-500">
-            Convert your SPECTRA .csv file into a Pisayian database .csv file
+            Click "Clean Data" to validate and standardize 
+            your CSV.
+            Then click "Normalize Data" to split it into 
+            structured tables.
           </p>
 
           {/* Dropzone with Icon */}
