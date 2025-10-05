@@ -78,8 +78,21 @@ Cruz,Juan,Western Visayas,2018
 # Output (After Normalization)
 The downloaded `.zip` includes:
 -`alumni.csv` -> alumni information
+
 -`campus.csv` -> unique campus list
+
 -`alumni_campus.csv` -> relationship mapping
+
+# A Special Thanks To
+-**Craig Ondevilla**: Outstanding frontend design and visuals
+
+-**Julian Laxamana**: Support with project documentation
+
+-**Ravel Valdez**: Project organization and housekeeping
+
+-**Nolan Dela Rosa**: System architect and backend developer.
+
+Couldn't have asked for a better development team 💙
 
 
 
