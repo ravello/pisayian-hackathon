@@ -9,9 +9,10 @@ import { Upload } from "lucide-react";
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isNormalizing, setIsNormalizing] = useState(false);
 
   // Used for drag and drop csv file section
-  // @ts-expect-error
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: false,
     accept: { "text/csv": [".csv"] },
@@ -62,7 +63,7 @@ export default function Home() {
       // cleanup
       window.URL.revokeObjectURL(url);
 
-      alert("File converted successfully! Downloading.");
+      alert("File cleaned successfully! Downloading.");
     } catch (error) {
       console.error("Error", error);
       alert("File upload failed, please try again.");
@@ -72,12 +73,12 @@ export default function Home() {
   };
 
   const handleNormalize = async () => {
-    if(!selectedFile) {
+    if (!selectedFile) {
       alert("Please select a file first.");
       return;
     }
 
-    setIsUploading(true);
+    setIsNormalizing(true);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -87,7 +88,7 @@ export default function Home() {
       body: formData,
     });
 
-    if(!res.ok) {
+    if (!res.ok) {
       alert("Normalization failed");
       setIsUploading(false);
       return;
@@ -103,7 +104,9 @@ export default function Home() {
     a.click();
     a.remove();
 
-    setIsUploading(false);
+    alert("File normalized successfully! Downloading.");
+
+    setIsNormalizing(false);
   };
 
   return (
@@ -163,16 +166,22 @@ export default function Home() {
             disabled={!selectedFile || isUploading}
             onClick={handleUpload}
           >
-            {isUploading ? "Uploading..." : "Upload"}
+            {isUploading ? "Cleaning..." : "Clean Data"}
           </button>
           {/* Normalize Button */}
-          <button
-            className={`px-4 py-2 border rounded-full bg-green-300 border-green-500 hover:bg-green-400 transition-colors duration-150 active:bg-green-500 font-bold text-green-800 shadow-[0_4px_0_0_oklch(79.5%_0.184_86.047)] ${
-              !selectedFile || isUploading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={!selectedFile || isUploading}
-            onClick={handleNormalize}
-            ></button>
+          {
+            <button
+              className={`px-4 py-2 border rounded-full bg-green-300 border-green-500 hover:bg-green-400 transition-colors duration-150 active:bg-green-500 font-bold text-green-800 shadow-[0_4px_0_0_oklch(79.2%_0.209_151.711)] ${
+                !selectedFile || isUploading
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
+              disabled={!selectedFile || isUploading}
+              onClick={handleNormalize}
+            >
+              {isNormalizing ? "Normalizing..." : "Normalize Data"}
+            </button>
+          }
         </div>
       </main>
 
