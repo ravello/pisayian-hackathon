@@ -64,6 +64,11 @@ export default function Home() {
       window.URL.revokeObjectURL(url);
 
       alert("File cleaned successfully! Downloading.");
+
+      // reset state so user can re-upload cleaned file
+      setSelectedFile(null);
+      document.querySelector('input[type="file"]').value = "";
+      
     } catch (error) {
       console.error("Error", error);
       alert("File upload failed, please try again.");
@@ -86,16 +91,15 @@ export default function Home() {
     const res = await fetch("http://localhost:5001/api/normalize", {
       method: "POST",
       body: formData,
+      mode: "cors",
+      headers: { Accept: "application/zip" },
     });
 
-    if (!res.ok) {
-      alert("Normalization failed");
-      setIsUploading(false);
-      return;
-    }
+    if(!res.ok) throw new Error("Request failed");
 
     // handle ZIP download
-    const blob = await res.blob();
+    const arrayBuffer = await res.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: "application/zip" })
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -103,8 +107,12 @@ export default function Home() {
     document.body.appendChild(a);
     a.click();
     a.remove();
+    window.URL.revokeObjectURL(url);
 
     alert("File normalized successfully! Downloading.");
+    // reset state so user can re-upload cleaned file
+      setSelectedFile(null);
+      document.querySelector('input[type="file"]').value = "";
 
     setIsNormalizing(false);
   };
@@ -138,7 +146,7 @@ export default function Home() {
           <p className="text-center text-neutral-500">
             Click "Clean Data" to standardize and download
             your reformatted CSV.
-            Then, using the downloaded file, click 
+            Then, re-upload the downloaded file and click 
             "Normalize Data" to split it into 
             structured tables.
           </p>

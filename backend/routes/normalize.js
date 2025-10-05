@@ -65,28 +65,43 @@ router.post("/", upload.single("file"), async (req, res) => {
         const alumniCampus = [];
         const campusSet = new Map();
 
-        data.forEach((row, index) => {
-            const alumniId = index + 1;
-            const campusName = row.Campus?.trim();
+        const getValue = (row, ...keys) => {
+                for(const k of keys) {
+                    if(row[k] !== undefined && row[k] !== null && row[k] !== "") return row[k].trim();
+                }
 
-            // add campus to unique set
-            if(campusName && !campusSet.has(campusName)) {
-                const campusId = campusSet.size + 1;
+                return "";
+        };
+        
+        data.forEach((row, index) => {
+
+            const lastName = getValue(row, "LastName", "last_name");
+            const firstName = getValue(row, "FirstName", "first_name");
+            const campusName = getValue(row, "Campus", "campus");
+            const batchYear = getValue(row, "Batch", "batch_year");
+
+            // assign numeric IDs
+            const alumniId = index + 1;
+            let campusId;
+
+            if(!campusSet.has(campusName)) {
+                campusId = campusSet.size + 1;
                 campusSet.set(campusName, campusId);
                 campuses.push({
                     campus_id: campusId,
                     campus_name: campusName,
                 });
-            }
 
-            const campusId = campusSet.get(campusName);
+            } else {
+                campusId = campusSet.get(campusName);
+            }
 
             // alumni table
             alumni.push({
                 alumni_id: alumniId,
-                last_name: row.LastName?.trim(),
-                first_name: row.FirstName?.trim(),
-                batch_year: row.Batch?.trim(),
+                last_name: lastName,
+                first_name: firstName,
+                batch_year: batchYear,
             });
 
             // relationship table
@@ -98,15 +113,36 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         // create ZIP archive
         const archive = archiver("zip");
-        res.attachment("normalized_output.zip");
+        
+        // send ZIP file back to client
+        res.header("Content-Type", "application/zip");
+        res.header(
+            "Content-Disposition",
+            "attachment; filename=normalized_output.zip"
+        );
+
+        res.setHeader("Transfer-Encoding", "chunked");
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+        res.setHeader("Connection", "close");
+
         archive.pipe(res);
+
+        // add safety/error handling (helps debug browswe-side issues)
+        archive.on("error", (err) => {
+            console.error("Archiver error:", err);
+            if(!res.headersSent) {
+                res.status(500).json({ error: "ZIP creation failed" });
+            }
+        });
+
+        archive.on("end", () => console.log("ZIP stream finished successfully"));  
 
         // add each dataset as CSV
         archive.append(Papa.unparse(alumni), { name: "alumni.csv" });
         archive.append(Papa.unparse(campuses), { name: "campus.csv" });
         archive.append(Papa.unparse(alumniCampus), { name: "alumni_campus.csv" });
 
-        await archive.finalize();
+        archive.finalize();
 
     } catch (err) {
         console.error(err);
