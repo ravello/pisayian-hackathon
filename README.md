@@ -77,6 +77,7 @@ Cruz,Juan,Western Visayas,2018
 
 # Output (After Normalization)
 The downloaded `.zip` includes:
+
 -`alumni.csv` -> alumni information
 
 -`campus.csv` -> unique campus list
