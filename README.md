@@ -84,13 +84,13 @@ The downloaded `.zip` includes:
 -`alumni_campus.csv` -> relationship mapping
 
 # A Special Thanks To
--**Craig Ondevilla**: Outstanding frontend design and visuals
+-**Craig Ondevilla**: outstanding frontend design and visuals
 
--**Julian Laxamana**: Support with project documentation
+-**Julian Laxamana**: support with project documentation
 
--**Ravel Valdez**: Project organization and housekeeping
+-**Ravel Valdez**: project organization and housekeeping
 
--**Nolan Dela Rosa**: System architect and backend developer.
+-**Nolan Dela Rosa**: system architect and backend developer.
 
 **Couldn't have asked for a better development team** 💙
 
