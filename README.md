@@ -9,22 +9,22 @@ This project was built for Kapwa Codefest 2025 to address inconsistencies in alu
 Built with a focus on data accuracy, modular backend architecture, and simplicity of use.
 
 # Features
--**Data Cleaning**: Removes invalid or incomplete entries from uploaded `.csv`s.
+- **Data Cleaning**: Removes invalid or incomplete entries from uploaded `.csv`s.
 
--**Normalization**: Exports a .`zip` file containing relational tables (`alumni.csv`, `campus.csv`, `alumni_csv`).
+- **Normalization**: Exports a .`zip` file containing relational tables (`alumni.csv`, `campus.csv`, `alumni_csv`).
 
--**File Upload System**: Drag-and-drop `.csv` upload interface with instant file download.
+- **File Upload System**: Drag-and-drop `.csv` upload interface with instant file download.
 
--**User-Friendly Frontend**: Modern UI using `Next.js`, `Tailwind.css`, and Lucide icons.
+- **User-Friendly Frontend**: Modern UI using `Next.js`, `Tailwind.css`, and Lucide icons.
 
--**Modular Backend**: `Node.js` + `Express` routes (`/api/transform`, `/api/normalize`) for clear separation of concerns.
+- **Modular Backend**: `Node.js` + `Express` routes (`/api/transform`, `/api/normalize`) for clear separation of concerns.
 
 # Tech Stack
--**Frontend**: `Next.js` (`React`), `TailwindCSS`, Lucide Icons
+- **Frontend**: `Next.js` (`React`), `TailwindCSS`, Lucide Icons
 
--**Backend**: `Node.js`, `Express.js`, `Multer`, `PapaParse`, `Archiver`
+- **Backend**: `Node.js`, `Express.js`, `Multer`, `PapaParse`, `Archiver`
 
--**File Handling**: `.csv` Parsing, File Upload, `.zip` Generation
+- **File Handling**: `.csv` Parsing, File Upload, `.zip` Generation
 
 # How It Works
 1. Upload your raw `.csv` file.
@@ -34,8 +34,8 @@ Built with a focus on data accuracy, modular backend architecture, and simplicit
 3. (Optional) Click **Normalize Data** -> downloads a `.zip` containing 3 normalized `.csv` files.
 
 Each button corresponds to a backend route:
--`/api/transform` -> data cleaning
--`api/normalize` -> data normalization
+- `/api/transform` -> data cleaning
+- `api/normalize` -> data normalization
 
 # Running Locally
 ```
@@ -78,20 +78,20 @@ Cruz,Juan,Western Visayas,2018
 # Output (After Normalization)
 The downloaded `.zip` includes:
 
--`alumni.csv` -> alumni information
+- `alumni.csv` -> alumni information
 
--`campus.csv` -> unique campus list
+- `campus.csv` -> unique campus list
 
--`alumni_campus.csv` -> relationship mapping
+- `alumni_campus.csv` -> relationship mapping
 
 # A Special Thanks To
--**Craig Ondevilla**: outstanding frontend design and visuals
+- **Craig Ondevilla**: outstanding frontend design and visuals
 
--**Julian Laxamana**: support with project documentation
+- **Julian Laxamana**: support with project documentation
 
--**Ravel Valdez**: project organization and housekeeping
+- **Ravel Valdez**: project organization and housekeeping
 
--**Nolan Dela Rosa**: system architect and backend developer.
+- **Nolan Dela Rosa**: system architect and backend developer.
 
 **Couldn't have asked for a better development team** 💙
 
