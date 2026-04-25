@@ -11,6 +11,8 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const [isNormalizing, setIsNormalizing] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // Used for drag and drop csv file section
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -39,7 +41,7 @@ export default function Home() {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch("http://localhost:5001/api/transform", {
+      const response = await fetch(`${API_URL} /api/transform`, {
         method: "POST",
         body: formData,
       });
@@ -68,7 +70,6 @@ export default function Home() {
       // reset state so user can re-upload cleaned file
       setSelectedFile(null);
       document.querySelector('input[type="file"]').value = "";
-      
     } catch (error) {
       console.error("Error", error);
       alert("File upload failed, please try again.");
@@ -88,18 +89,18 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    const res = await fetch("http://localhost:5001/api/normalize", {
+    const res = await fetch(`${API_URL}/api/normalize`, {
       method: "POST",
       body: formData,
       mode: "cors",
       headers: { Accept: "application/zip" },
     });
 
-    if(!res.ok) throw new Error("Request failed");
+    if (!res.ok) throw new Error("Request failed");
 
     // handle ZIP download
     const arrayBuffer = await res.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: "application/zip" })
+    const blob = new Blob([arrayBuffer], { type: "application/zip" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -111,8 +112,8 @@ export default function Home() {
 
     alert("File normalized successfully! Downloading.");
     // reset state so user can re-upload cleaned file
-      setSelectedFile(null);
-      document.querySelector('input[type="file"]').value = "";
+    setSelectedFile(null);
+    document.querySelector('input[type="file"]').value = "";
 
     setIsNormalizing(false);
   };
@@ -144,11 +145,9 @@ export default function Home() {
             Pisayian CSV Converter
           </h1>
           <p className="text-center text-neutral-500">
-            Click "Clean Data" to standardize and download
-            your reformatted CSV.
-            Then, re-upload the downloaded file and click 
-            "Normalize Data" to split it into 
-            structured tables.
+            Click "Clean Data" to standardize and download your reformatted CSV.
+            Then, re-upload the downloaded file and click "Normalize Data" to
+            split it into structured tables.
           </p>
 
           {/* Dropzone with Icon */}
