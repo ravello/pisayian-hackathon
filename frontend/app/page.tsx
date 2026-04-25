@@ -146,9 +146,9 @@ export default function Home() {
             Pisayian CSV Converter
           </h1>
           <p className="text-center text-neutral-500">
-            Click "Clean Data" to standardize and download your reformatted CSV.
-            Then, re-upload the downloaded file and click "Normalize Data" to
-            split it into structured tables.
+            Click &quot;Clean Data&quot; to standardize and download your
+            reformatted CSV. Then, re-upload the downloaded file and click
+            &quot;Normalize Data&quot; to split it into structured tables.
           </p>
 
           {/* Dropzone with Icon */}
