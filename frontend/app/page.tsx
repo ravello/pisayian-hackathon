@@ -41,7 +41,8 @@ export default function Home() {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch(`${API_URL} /api/transform`, {
+      console.log("API_URL:", API_URL);
+      const response = await fetch(`${API_URL}/api/transform`, {
         method: "POST",
         body: formData,
       });
