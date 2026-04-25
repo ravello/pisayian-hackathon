@@ -24,7 +24,7 @@ import transformRoute from "./routes/transform.js";
 import normalizeRoute from "./routes/normalize.js";
 
 const app = express();
-app.use(cors({ origin: ["http://localhost:3000", "http://localhost:3001"] }));
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => res.send("Backend is running!"));
