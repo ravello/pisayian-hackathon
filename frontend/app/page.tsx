@@ -70,7 +70,12 @@ export default function Home() {
 
       // reset state so user can re-upload cleaned file
       setSelectedFile(null);
-      document.querySelector('input[type="file"]').value = "";
+      const fileInput =
+        document.querySelector<HTMLInputElement>('input[type="file"]');
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (error) {
       console.error("Error", error);
       alert("File upload failed, please try again.");
@@ -114,7 +119,12 @@ export default function Home() {
     alert("File normalized successfully! Downloading.");
     // reset state so user can re-upload cleaned file
     setSelectedFile(null);
-    document.querySelector('input[type="file"]').value = "";
+    const fileInput =
+      document.querySelector<HTMLInputElement>('input[type="file"]');
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
 
     setIsNormalizing(false);
   };
